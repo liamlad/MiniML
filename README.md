@@ -1,6 +1,8 @@
 # MiniML
 A functional programming language written in OCaml
 
+This project was submitted as a Final project for a Functional Programming course.
+
 The parser to convert the external language into the internal OCaml compatible language is not my work, but everything after lines 1841 is my own implementation.
 I wrote functions to evaluate expressions (using substitution of free variables), inferring the type of an expression and unifying type variables.
 
