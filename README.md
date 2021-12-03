@@ -8,8 +8,9 @@ Lines 1 to 218 define the valid types, expressions and operations of the interna
 
 This code requires installing OCaml, see https://ocaml.org/docs/install.html
 
-Recommended: install utop https://github.com/ocaml-community/utop
+Install utop https://github.com/ocaml-community/utop
 
-Once installed, run utop, and inside the utop program, run
+Once installed, run `utop` from the command line, and inside the utop program, run
+
     #use "MiniML.ml"
     execute "external MiniML code"
