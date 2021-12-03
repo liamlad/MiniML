@@ -1,8 +1,3 @@
-(**
- * DO NOT SUBMIT the entire file.
- * Submit only the code after the comments
- * "(** Template Begins Here *)".
- *)
 exception NotImplemented
 
 (* Variables *)
@@ -1845,7 +1840,7 @@ end
 
 (** Template Begins Here *)
 
-(* Q0  : Get familiar with the external syntax of MiniML *)
+(* Getting familiar with the external syntax of MiniML *)
 let parse_tests : (string * (string, exp) either) list = [
     (* Provide your tests for the parser *)
     ("1;", Right (Int 1));
@@ -1923,7 +1918,7 @@ let rec extract_expr (dl : dec list) acc = match dl with
     | ByName (e, n) -> extract_expr t (e::acc)
 
 
-(* Q1  : Find the free variables in an expression *)
+(* Finding the free variables in an expression *)
 let rec free_vars (e : exp) : name list =  
   let rec free_let dl names = match dl with
     | [] -> []
@@ -2010,7 +2005,7 @@ let rec delete_once ds set =
     
 
 
-(* Q2  : Check variables are in use *)
+(* Checking variables are in use *)
 let rec unused_vars (e : exp) : name list = 
   match e with
     | Int _ -> []
@@ -2062,7 +2057,7 @@ let subst_tests : (((exp * name) * exp) * exp) list = [
 
 
 
-(* Q3  : Substitute a variable *)
+(* Substituting a variable *)
 let rec subst ((e', x) : exp * name) (e : exp) : exp =
    match e with
   | Var y ->
@@ -2132,7 +2127,7 @@ let eval_tests : (exp * exp) list = [
   Apply (Var "fact", Int 5))), Int 120)
 ]
 
-(* Q4  : Evaluate an expression in big-step *)  
+(* Evaluating an expression in big-step *)  
 let rec eval : exp -> exp =
   (* do not modify from here *)
   let bigstep_depth = ref 0 in
@@ -2196,14 +2191,12 @@ let rec eval : exp -> exp =
 
               end end
       in
-    (* do not change the code from here *)
       decr bigstep_depth;
       if !debug >= 1 then
         print_endline
           (String.make (!bigstep_depth) ' '
           ^ "result of eval (" ^ Print.exp_to_string e ^ ") = "
           ^ Print.exp_to_string result ^ "\n");
-    (* to here *)
       result
 
 
@@ -2264,8 +2257,7 @@ let rec occ_check (TVar a) t =
   | TProduct tl -> List.fold_left (&&) true (List.map (occ_check (TVar a)) tl)
   | TVar b -> not (typ_eq (TVar a) (TVar b))
 
-(* find the next function for Q5 *)
-(* Q6  : Unify two types *)
+(* Unifying two types *)
 let rec unify (ty1 : typ) (ty2 : typ) : unit = 
   match ty1, ty2 with
   | TInt, TInt -> ()
@@ -2287,10 +2279,7 @@ let rec unify (ty1 : typ) (ty2 : typ) : unit =
      | Some t2 -> unify t2 t end
   | _ -> type_fail "Could not be unified!"
 
-
-(* Q5  : Type an expression *)
-(* Q7* : Implement the argument type inference
-         For this question, move this function below the "unify". *)
+(* Inferring types *)
 
 let rec tproduct n acc= 
   if n = 0 then TProduct (acc)
@@ -2349,7 +2338,7 @@ let rec infer (ctx : context) (e : exp) : typ =
     | Anno (e, t) -> begin try unify (infer ctx e) t; t with _ -> type_fail "Anno is incorrect!" end
 
 
-(* Now you can play with the language that you've implemented! *)
+(* Executing code directly! *)
 let execute (s: string) : unit =
   match P.parse s with
   | Left s -> print_endline ("parsing failed: " ^ s)
@@ -2368,11 +2357,9 @@ let execute (s: string) : unit =
 
 
 (************************************************************
- *                     Tester template:                     *
- *         Codes to test your interpreter by yourself.      *
- *         You can change these to whatever you want.       *
- *                We won't grade these codes                *
+                TESTING
  ************************************************************)
+ 
 let list_to_string el_to_string l : string =
   List.fold_left
     begin fun acc el ->
