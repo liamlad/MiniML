@@ -1838,9 +1838,9 @@ end = struct
     expstr 0 e
 end
 
-(** Template Begins Here *)
+(* Template Begins Here *)
 
-(* Getting familiar with the external syntax of MiniML *)
+(* Tests to check the parser works as intended *)
 let parse_tests : (string * (string, exp) either) list = [
     (* Provide your tests for the parser *)
     ("1;", Right (Int 1));
@@ -1867,7 +1867,7 @@ let parse_tests : (string * (string, exp) either) list = [
     ("(1, 2);", Right (Tuple [Int 1; Int 2]))
 ]
 
-
+(* Tests for computing the free variables of an expression *)
 let free_vars_tests : (exp * name list) list = [
   (Int 10, []);
   (If (
@@ -1903,6 +1903,8 @@ let free_vars_tests : (exp * name list) list = [
    [Primop (Plus, [Primop (Plus, [Var "x"; Var "y"]); Var "z"]); Var "w"]))), ["w"]);
   ((Let ([Valtuple (Tuple [Int 2; Var "x"], ["x"; "y"])], Var "y")), ["x"])
 ]
+
+(* Helper functions for free_vars *)
 let rec extract_names (dl : dec list) acc = match dl with 
   | [] -> acc
   | d::t -> match d with
@@ -1942,7 +1944,7 @@ let rec free_vars (e : exp) : name list =
   | Var x -> [x]
   | Anno (e, t) -> free_vars e
 
-
+(* Tests for computing unused variables of an expression *)
 let unused_vars_tests : (exp * name list) list = [
   ((Let ([Val (Int 3, "x")], Int 4)), ["x"]);
   ((Let ([Val (Bool true, "x")],
@@ -1986,6 +1988,7 @@ let unused_vars_tests : (exp * name list) list = [
   Int 1)), ["f"])
 ]
 
+(* Helper functions *)
 let rec get_unused names free acc =
   match names with
   | [] -> acc
@@ -2005,7 +2008,7 @@ let rec delete_once ds set =
     
 
 
-(* Checking variables are in use *)
+(* Computing the unused variables of an expression *)
 let rec unused_vars (e : exp) : name list = 
   match e with
     | Int _ -> []
@@ -2034,7 +2037,7 @@ let rec unused_vars (e : exp) : name list =
     | Var x -> []
     | Anno (e1, t) -> unused_vars e1
 
-
+(* Tests for substituting free variables with an expression *)
 let subst_tests : (((exp * name) * exp) * exp) list = [
   ((((Primop (Plus, [Var "q"; Int 4])), "p"), (Let
   ([Val (Int 5, "x"); Val (Primop (Plus, [Var "x"; Int 3]), "y");
@@ -2051,13 +2054,11 @@ let subst_tests : (((exp * name) * exp) * exp) list = [
     Valtuple (Tuple [Primop (Plus, [Var "x"; Var "q"]); Var "y"], ["z"; "q"])],
   Primop (Plus,
    [Primop (Plus, [Primop (Plus, [Var "x"; Var "y"]); Var "z"]); Var "q"])))), Int 10)
-  (*(((e', x), exp), result);*)
 
 ]
 
 
-
-(* Substituting a variable *)
+(* Substituting free variables with an expression *)
 let rec subst ((e', x) : exp * name) (e : exp) : exp =
    match e with
   | Var y ->
@@ -2104,6 +2105,7 @@ let rec subst ((e', x) : exp * name) (e : exp) : exp =
     else Rec (f, t, e)
 
 
+(* Tests for evaluating expressions *)
 let eval_tests : (exp * exp) list = [
   ((Let
   ([Val
@@ -2129,7 +2131,6 @@ let eval_tests : (exp * exp) list = [
 
 (* Evaluating an expression in big-step *)  
 let rec eval : exp -> exp =
-  (* do not modify from here *)
   let bigstep_depth = ref 0 in
     fun e ->
       if !debug >= 1 then
@@ -2137,7 +2138,7 @@ let rec eval : exp -> exp =
           (String.make (!bigstep_depth) ' '
           ^ "eval (" ^ Print.exp_to_string e ^ ")\n");
       incr bigstep_depth;
-    (* to here *)
+      
       let result =
         match e with
         | Int _ | Bool _ -> e
@@ -2199,7 +2200,7 @@ let rec eval : exp -> exp =
           ^ Print.exp_to_string result ^ "\n");
       result
 
-
+(* Tests for type inference *)
 let infer_tests : ((context * exp) * typ) list = [
   ((Ctx ([]), (Let
   ([Val
@@ -2241,7 +2242,7 @@ let infer_tests : ((context * exp) * typ) list = [
 
 ]
 
-
+(* Tests for unifying type variables *)
 let unify_tests : ((typ * typ) * unit) list = [
   ((fresh_tvar (), TInt), ());
   ((TArrow (fresh_tvar (), TBool), TArrow (TInt, fresh_tvar ())), ());
@@ -2249,6 +2250,7 @@ let unify_tests : ((typ * typ) * unit) list = [
   ((fresh_tvar (), TProduct [fresh_tvar (); fresh_tvar ()] ), ())
 ]
 
+(* Helper *)
 let rec occ_check (TVar a) t = 
   match t with
   | TInt -> true
@@ -2256,6 +2258,7 @@ let rec occ_check (TVar a) t =
   | TArrow (t1, t2) -> occ_check (TVar a) t1 && occ_check (TVar a) t2
   | TProduct tl -> List.fold_left (&&) true (List.map (occ_check (TVar a)) tl)
   | TVar b -> not (typ_eq (TVar a) (TVar b))
+
 
 (* Unifying two types *)
 let rec unify (ty1 : typ) (ty2 : typ) : unit = 
@@ -2279,8 +2282,8 @@ let rec unify (ty1 : typ) (ty2 : typ) : unit =
      | Some t2 -> unify t2 t end
   | _ -> type_fail "Could not be unified!"
 
-(* Inferring types *)
 
+(* Inferring types *)
 let rec tproduct n acc= 
   if n = 0 then TProduct (acc)
   else let a = fresh_tvar () in 
